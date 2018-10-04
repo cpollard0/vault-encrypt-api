@@ -1,0 +1,117 @@
+---
+- name: build lambda
+  hosts: chris_test
+  connection: local
+  gather_facts: false
+  ignore_errors: true
+
+  vars:
+    lambda_function_name: inf-vault-lam-encrypt
+    lambda_filename: "{{ lambda_function_name }}_test.zip"
+    lambda_path: "{{ playbook_dir }}/build"
+
+  tasks:
+
+    - name: Creates directory
+      file:
+        path: "{{ lambda_path }}/utilities"
+        state: directory
+        recurse: yes
+
+    # - name: pip install reqs
+    #   command: pip install -r {{ playbook_dir }}/lambda_requirements.txt -t {{ lambda_path }}
+    #   args:
+    #     chdir: "{{ lambda_path }}"
+
+    # TODO: Get pycrypto from here: https://github.com/Miserlou/lambda-packages
+    # TODO: Copy ansible.cfg to build dir
+
+    - name: copy lambda to build directory
+      copy:
+        src: "{{ playbook_dir }}/vault_encrypt_lambda.py"
+        dest: "{{ lambda_path }}/vault_encrypt_lambda.py"
+
+    - name: create build for lambda
+      command: zip -r {{ lambda_path }}/{{ lambda_filename }} .
+      args:
+        chdir: "{{ lambda_path }}"
+
+    # - name: create lambda role
+    #   cloudformation:
+    #     aws_access_key: "{{ aws_access_key }}"
+    #     aws_secret_key: "{{ aws_secret_key }}"
+    #     security_token: "{{ security_token }}"
+    #     region: "{{ aws_region }}"
+    #     stack_name: "pin-mysql-cf-setup{{ label }}"
+    #     state: present
+    #     disable_rollback: true
+    #     template: cloudformation/mysql_user_lambda_role.yml
+    #     template_parameters:
+    #       environment: "{{ label }}"
+    #       ssmMysqlHost: "{{ ssm_mysql_host }}"
+    #       ssmProftpdPass: "{{ ssm_proftpd_pass }}"
+    #       pStoreKMSPolicyArn: "{{ kms_managed_policy_arn }}"
+    #     tags:
+    #       project: "aws-cfm"
+    #   register: lambda_role
+    #   delegate_to: localhost
+
+    # - name: create lambda function
+    #   lambda:
+    #     aws_access_key: "{{ aws_access_key }}"
+    #     aws_secret_key: "{{ aws_secret_key }}"
+    #     security_token: "{{ security_token }}"
+    #     region: "{{ aws_region }}"
+    #     name: pin-mysql-lam-setup
+    #     state: present
+    #     zip_file: '{{ lambda_path }}/{{ lambda_filename }}'
+    #     runtime: 'python3.6'
+    #     role: "{{ lambda_role['stack_outputs']['pinsqlserverrole'] }}"
+    #     handler: lambda_function.lambda_handler
+    #     vpc_subnet_ids:
+    #       - "{{ private_subnet }}"
+    #     vpc_security_group_ids:
+    #       - "{{ lambda_sg }}"
+    #     timeout: 120
+    #     memory_size: 128
+    #   register: lambda_function
+    #   delegate_to: localhost
+
+    # - name: execute lambda
+    #   execute_lambda:
+    #     aws_access_key: "{{ aws_access_key }}"
+    #     aws_secret_key: "{{ aws_secret_key }}"
+    #     security_token: "{{ security_token }}"
+    #     region: "{{ aws_region }}"
+    #     function_arn: "{{ lambda_function['configuration']['function_arn'] }}"
+    #     payload:
+    #       ssm_proftpd_pass: "{{ ssm_proftpd_pass }}"
+    #       ssm_mysql_host: "{{ ssm_mysql_host }}"
+    #     wait: true
+    #   register: lambda_results
+    #   delegate_to: localhost
+
+    # - name: delete lambda function
+    #   lambda:
+    #     aws_access_key: "{{ aws_access_key }}"
+    #     aws_secret_key: "{{ aws_secret_key }}"
+    #     security_token: "{{ security_token }}"
+    #     region: "{{ aws_region }}"
+    #     state: absent
+    #     name: pin-mysql-lam-setup
+    #     zip_file: '{{ lambda_path }}/{{ lambda_filename }}'
+    #     runtime: 'python3.6'
+    #     role: "{{ lambda_role['stack_outputs']['pinsqlserverrole']}}"
+    #     handler: lambda_function.lambda_handler
+    #     timeout: 60
+    #   delegate_to: localhost
+
+    # - name: delete lambda role
+    #   cloudformation:
+    #     aws_access_key: "{{ aws_access_key }}"
+    #     aws_secret_key: "{{ aws_secret_key }}"
+    #     security_token: "{{ security_token }}"
+    #     region: "{{ aws_region }}"
+    #     stack_name: "pin-mysql-cf-setup{{ label }}"
+    #     state: absent
+    #   delegate_to: localhost
