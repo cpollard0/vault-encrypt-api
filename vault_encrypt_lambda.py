@@ -34,7 +34,6 @@ def get_vault_password():
 
 def lambda_handler(event, context):
     """Main Lambda function."""
-    print("HEre")
     vault_pass = get_vault_password()
     logging.debug("Vault Password: %s", vault_pass)
     vault = VaultLib(make_secret(vault_pass))
@@ -45,7 +44,7 @@ def lambda_handler(event, context):
     return secret
 
 def main():
-  print("Hello World!")
+  print("Main")
 
 if __name__== "__main__":
   main()
