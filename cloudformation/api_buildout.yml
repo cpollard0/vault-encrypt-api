@@ -1,0 +1,14 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: serverless vault encryption api
+Globals:
+  Function:
+    Runtime: python2.7
+    Timeout: 180
+    Handler: lambda_function.lambda_handler
+Resources:
+  encryptFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: vault encryption function

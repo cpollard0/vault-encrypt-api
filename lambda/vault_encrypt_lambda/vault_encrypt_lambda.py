@@ -1,4 +1,7 @@
-""" vault encrypt lambda """
+""" vault encrypt lambda
+    Takes in a secret and a vault password file to use
+    Returns a vault encrypted string
+ """
 from __future__ import print_function
 import logging
 import json
@@ -14,20 +17,19 @@ DEBUG_MODE = True
 if DEBUG_MODE:
     LOGGER.setLevel(logging.DEBUG)
 
+# Set directories or ansible tries to set on it's own, which breaks in lambda
 ansible.constants.DEFAULT_LOCAL_TMP = '/tmp/ansible'
 ansible.constants.DEFAULT_REMOTE_TMP = '/tmp/ansible'
 ansible.local_tmp = '/tmp/ansible'
 SSM_CLIENT = boto3.client('ssm')
 
-# Set directories or ansible tries to set on it's own, which breaks in lambda
 def make_secret(secret):
     from ansible.constants import DEFAULT_VAULT_ID_MATCH
     from ansible.parsing.vault import VaultSecret
     return [(DEFAULT_VAULT_ID_MATCH, VaultSecret(secret))]
 
-#TODO: Make this get the PW from SSM?
 def get_vault_password(key_name):
-    """ gets vault password file and reutrns it cleaned"""
+    """ gets vault password file and returns it cleaned"""
     response = SSM_CLIENT.get_parameter(
         Name=key_name,
         WithDecryption=True
