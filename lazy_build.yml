@@ -16,18 +16,28 @@
         path: "{{ lambda_path }}/build"
         state: directory
 
-    - name: pip install reqs
-      command: pip install -r {{ lambda_path }}/lambda_requirements.txt -t {{ lambda_path }}/build
-      args:
-        chdir: "{{ lambda_path }}"
+    - name: cpy lambda function to build directory
+      copy:
+        src: "{{ lambda_path }}/vault_encrypt_lambda.py"
+        dest: "{{ lambda_path }}/build/vault_encrypt_lambda.py"
+
+    # - name: pip install reqs
+    #   command: pip install -r {{ lambda_path }}/lambda_requirements.txt -t {{ lambda_path }}/build
+    #   args:
+    #     chdir: "{{ lambda_path }}"
 
     # TODO: Get pycrypto from here: https://github.com/Miserlou/lambda-packages
-    # TODO: Copy ansible.cfg to build dir
+
+    # This is needed to configure temp directory from ~/tmp to /tmp (can't write to ~/tmp in lambda)
+    - name: copy ansible.cfg to build dir
+      copy:
+        src: "{{ playbook_dir }}/ansible.cfg"
+        dest: "{{ lambda_path }}/build/ansible.cfg"
 
     - name: create build for lambda
       command: zip -r {{ lambda_path }}/build/{{ lambda_filename }} .
       args:
-        chdir: "{{ lambda_path }}"
+        chdir: "{{ lambda_path }}/build"
 
     # - name: create lambda role
     #   cloudformation:
@@ -59,9 +69,9 @@
     #     state: present
     #     zip_file: '{{ lambda_path }}/{{ lambda_filename }}'
     #     runtime: 'python2.7'
-    #     role: "{{ lambda_role['stack_outputs']['pinsqlserverrole'] }}"
+    #     role: "{{ lambda_role['stack_outputs']['vault_encrypt_role'] }}"
     #     handler: lambda_function.lambda_handler
     #     timeout: 120
-    #     memory_size: 128
+    #     memory_size: 1280 # This is bsed on testing; 600 MS execution time
     #   register: lambda_function
     #   delegate_to: localhost
