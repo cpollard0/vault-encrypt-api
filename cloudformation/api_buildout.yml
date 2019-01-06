@@ -12,3 +12,5 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Description: vault encryption function
+  encryptLambdaRole:
+  passwordManipulationLambdaRole:
