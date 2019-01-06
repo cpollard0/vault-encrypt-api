@@ -27,15 +27,26 @@ A parameter name can't include spaces.
 """
 
 def create_vault_password(application_name, vault_password_env, vault_password):
-    """ create an ansible vault password """
-    print (SSM_BASE_PATH + application_name + "/" + vault_password_env )
+    """ creates or updates an ansible vault password """
+    # TODO: Add logic to see if new/old differ; saving on unnecessary versions
+    LOGGER.debug(SSM_BASE_PATH + application_name + "/" + vault_password_env )
     response = SSM_CLIENT.put_parameter(
         Name=SSM_BASE_PATH + application_name + "/" + vault_password_env,
         Description='Vault password for ' + application_name + ' for env ' + vault_password_env,
         Value=vault_password,
         Type='SecureString',
+        Overwrite=True
         # TODO: Add in KMS CMK; can specify CMK based on access; i.e. read only vs power?
         #KeyId='string',
+    )
+    LOGGER.debug(response)
+    return
+
+def delete_vault_password(application_name, vault_password_env):
+    """ deletes an ansible vault password as stored in SSM"""
+    print (SSM_BASE_PATH + application_name + "/" + vault_password_env )
+    response = SSM_CLIENT.delete_parameter(
+        Name=SSM_BASE_PATH + application_name + "/" + vault_password_env
     )
     print (response)
     return
@@ -45,15 +56,18 @@ def lambda_handler(event, context):
     LOGGER.debug(event)
     LOGGER.debug(context)
     action = event['action']
+    # TODO: when API-fying - these are post and put
     if action == 'create':
         print ("Create a vault password")
         create_vault_password(event['application_name'], event['vault_password_env'], event['vault_password'])
+    elif action == 'delete':
+        print ("delete a vault password")
 
 def main():
   print("Main")
   # create_vault_password("chris_test_app", "nonprd", "blahbalalkdsajfals;jf")
   create_vault_password("chris_test_app", "preprd", "asdfteaeawt")
-  create_vault_password("chris_test_app", "prd", "asdfteaeawt")
+  create_vault_password("chris_test_app", "prd", "blarghahsdf")
 
 if __name__== "__main__":
   main()
