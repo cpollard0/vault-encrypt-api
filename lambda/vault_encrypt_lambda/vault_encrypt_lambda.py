@@ -32,6 +32,7 @@ def make_secret(secret):
 
 def get_vault_password(key_name):
     """ gets vault password file and returns it cleaned"""
+    # TODO: Add returns if the vault password doesn't exist
     response = SSM_CLIENT.get_parameter(
         Name=key_name,
         WithDecryption=True
@@ -41,12 +42,13 @@ def get_vault_password(key_name):
 def lambda_handler(event, context):
     """Main Lambda function."""
     # Get the vault password from SSM
+    # TODO: Add validate input function
     eventBody = json.loads(event['body'])
     vault_pass = get_vault_password(eventBody['key_name'])
     # Instantiate the vault with the vault password
     vault = VaultLib(make_secret(vault_pass))
     # Encrypt the secret
-    secret=vault.encrypt(eventBody['secret'], None, event.get('vault-id', None))
+    secret=vault.encrypt(eventBody['secret'], None, eventBody.get('vault-id', None))
     # TODO: Actually don't make this crappy
     outcome = {
         "isBase64Encoded": 'false',

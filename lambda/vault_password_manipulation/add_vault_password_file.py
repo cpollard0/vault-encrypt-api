@@ -55,6 +55,7 @@ def lambda_handler(event, context):
     LOGGER.debug(event)
     LOGGER.debug(context)
     eventBody = json.loads(event['body'])
+    # TODO: Add validate input function
     if event['httpMethod']== "POST" or event['httpMethod']== "PUT" :
         print ("Create a vault password")
         create_vault_password(eventBody['application_name'], eventBody['vault_password_env'], eventBody['vault_password'])
