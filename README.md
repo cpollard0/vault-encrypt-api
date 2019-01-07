@@ -16,12 +16,13 @@ The goal of this repo is to provide an API into vault passwords where they can b
 There will be two primary functions:
 
 1. The ability to store vault secrets in the parameter store. This takes care of the pesky "storing secrets in a spreadsheet problem".
-2. The ability to leverage those vault secrets to encrypt a string without knowing the vault secret. This takes care of the
-issue impedement of needing someone else to encrypt your secret (even if you own the secret...inefficient, right?).
+2. The ability to leverage those vault secrets to encrypt a string without knowing the vault secret. This takes care of the issue impedement of needing someone else to encrypt your secret (even if you own the secret...inefficient, right?).
 
-It will start out as two lambdas - one for manipulating the vault passwords and one for encrypting secrets.
+There are two lambdas -
 
-It will grow into a full fledged API to do these functions.
+1. manipulating the parameter store
+2. using one of those parameters to vault encrypt a string
 
-Over time, I want to build an angular app using amplify that leverages these APIs to provide a nice GUI into the tool. Or
-add it to ITMS.
+## Future
+
+Build a serverless angular app that uses these APIs. Maybe integrate into ITMS?
