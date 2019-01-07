@@ -72,6 +72,6 @@
     #     role: "{{ lambda_role['stack_outputs']['vault_encrypt_role'] }}"
     #     handler: lambda_function.lambda_handler
     #     timeout: 120
-    #     memory_size: 1280 # This is bsed on testing; 600 MS execution time
+    #     memory_size: 1280 # This is based on testing; 600 MS execution time; seems to be as low as we can get it
     #   register: lambda_function
     #   delegate_to: localhost

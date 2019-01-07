@@ -1,0 +1,148 @@
+---
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: "ansible vault API"
+schemes:
+  - "https"
+paths:
+  /encrypt_secret:
+    post:
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "vault encrypts a secret"
+          schema:
+            $ref: "#/definitions/Empty"
+        400:
+          description: "error vault encrypting a secret"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+        - api_key: []
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${encryptVaultSecretLambda.Arn}/invocations
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+  /vault_password:
+    post:
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "create a vault secret"
+          schema:
+            $ref: "#/definitions/Empty"
+        400:
+          description: "error creating a vault secret"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+        - api_key: []
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${vaultSecretLambda.Arn}/invocations
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    get:
+      produces:
+        - "application/json"
+      parameters:
+        - name: "application"
+          in: "query"
+          required: true
+          type: "string"
+        - name: "vault_password_file_env"
+          in: "query"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "succesfully gets a vault password"
+          schema:
+            $ref: "#/definitions/Empty"
+        404:
+          description: "error"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+        - api_key: []
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${vaultSecretLambda.Arn}/invocations
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    put:
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: ""
+          schema:
+            $ref: "#/definitions/Empty"
+        400:
+          description: ""
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+        - api_key: []
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${vaultSecretLambda.Arn}/invocations
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    delete:
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: ""
+          schema:
+            $ref: "#/definitions/Empty"
+        400:
+          description: ""
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+        - api_key: []
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${vaultSecretLambda.Arn}/invocations
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+# securityDefinitions:
+#   api_key:
+#     type: "apiKey"
+#     name: "x-api-key"
+#     in: "header"
+definitions:
+  Empty:
+    type: "object"
+    title: "Empty Schema"

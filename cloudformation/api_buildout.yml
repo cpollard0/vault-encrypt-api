@@ -1,16 +1,135 @@
 ---
-AWSTemplateFormatVersion: '2010-09-09'
-Transform: 'AWS::Serverless-2016-10-31'
-Description: serverless vault encryption api
-Globals:
-  Function:
-    Runtime: python2.7
-    Timeout: 180
-    Handler: lambda_function.lambda_handler
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: CloudFTP User Management API
+Parameters:
+  swaggerS3Location:
+    Description: s3 location of swagger file
+    Type: String
+    Default: pin-christest-s3-sbucket/ansible-api-swagger.yml
+
 Resources:
-  encryptFunction:
+  encryptLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub inf-ansiblevaultapi-iam-${AWS::Region}-vaultencryptcmp
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: '/'
+      Policies:
+        - PolicyName: access_param_store
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ssm:Get*'
+                Resource:
+                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/ansible/*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  passwordManipulationLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub inf-ansiblevaultapi-iam-${AWS::Region}-pwmanipulationcmp
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: '/'
+      Policies:
+        - PolicyName: access_param_store
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ssm:*'
+                Resource:
+                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/ansible/*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  ansibleVaultAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: inf-ansiblevault-api-gway
+      StageName: LATEST
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: !Sub s3://${swaggerS3Location}
+
+  vaultSecretLambda:
     Type: AWS::Serverless::Function
     Properties:
-      Description: vault encryption function
-  encryptLambdaRole:
-  passwordManipulationLambdaRole:
+      Description: CRUD for vault secrets as stored in parameter store
+      Handler: add_vault_password_file.lambda_handler
+      Runtime: python2.7
+      MemorySize: 128
+      Timeout: 300
+      FunctionName: inf-cmp-lam-storevaultpasswords
+      Role: !GetAtt passwordManipulationLambdaRole.Arn
+      CodeUri:
+        Bucket: pin-christest-s3-sbucket
+        Key: add_vault_password_file.zip
+      Events:
+        ApiPost:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ansibleVaultAPI
+            Path: /vault_password
+            Method: POST
+        ApiGet:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ansibleVaultAPI
+            Path: /vault_password
+            Method: GET
+        ApiDelete:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ansibleVaultAPI
+            Path: /vault_password
+            Method: DELETE
+        ApiUpdate:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ansibleVaultAPI
+            Path: /vault_password
+            Method: PUT
+
+  encryptVaultSecretLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: encrypt a secret using ansible-vault as stored in ssm
+      Handler: vault_encrypt_lambda.lambda_handler
+      Runtime: python2.7
+      MemorySize: 1280
+      Timeout: 300
+      FunctionName: inf-cmp-lam-encryptvaultpasswords
+      Role: !GetAtt encryptLambdaRole.Arn
+      CodeUri:
+        Bucket: pin-christest-s3-sbucket
+        Key: inf-vault-lam-encrypt_test.zip
+      Events:
+        ApiPost:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ansibleVaultAPI
+            Path: /encrypt_secret
+            Method: POST

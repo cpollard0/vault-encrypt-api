@@ -55,13 +55,20 @@ def lambda_handler(event, context):
     """Main Lambda function."""
     LOGGER.debug(event)
     LOGGER.debug(context)
-    action = event['action']
-    # TODO: when API-fying - these are post and put
-    if action == 'create':
+    eventBody = json.loads(event['body'])
+    if event['httpMethod']== "POST" or event['httpMethod']== "PUT" :
         print ("Create a vault password")
-        create_vault_password(event['application_name'], event['vault_password_env'], event['vault_password'])
-    elif action == 'delete':
+        create_vault_password(eventBody['application_name'], eventBody['vault_password_env'], eventBody['vault_password'])
+    elif event['httpMethod']== "DELETE" :
         print ("delete a vault password")
+    # TODO: Actually don't make this crappy
+    outcome = {
+        "isBase64Encoded": 'false',
+        "statusCode": 200,
+        "body": "done"
+    }
+    return outcome
+
 
 def main():
   print("Main")

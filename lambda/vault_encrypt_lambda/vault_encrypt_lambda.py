@@ -41,12 +41,19 @@ def get_vault_password(key_name):
 def lambda_handler(event, context):
     """Main Lambda function."""
     # Get the vault password from SSM
-    vault_pass = get_vault_password(event['key_name'])
+    eventBody = json.loads(event['body'])
+    vault_pass = get_vault_password(eventBody['key_name'])
     # Instantiate the vault with the vault password
     vault = VaultLib(make_secret(vault_pass))
     # Encrypt the secret
-    secret=vault.encrypt(event["secret"], None, event.get("vault-id", None))
-    return secret
+    secret=vault.encrypt(eventBody['secret'], None, event.get('vault-id', None))
+    # TODO: Actually don't make this crappy
+    outcome = {
+        "isBase64Encoded": 'false',
+        "statusCode": 200,
+        "body": secret
+    }
+    return outcome
 
 def main():
     print("Main")
