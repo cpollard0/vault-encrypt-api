@@ -44,11 +44,10 @@ def create_vault_password(application_name, vault_password_env, vault_password):
 
 def delete_vault_password(application_name, vault_password_env):
     """ deletes an ansible vault password as stored in SSM"""
-    print (SSM_BASE_PATH + application_name + "/" + vault_password_env )
     response = SSM_CLIENT.delete_parameter(
         Name=SSM_BASE_PATH + application_name + "/" + vault_password_env
     )
-    print (response)
+    LOGGER.debug(response)
     return
 
 def lambda_handler(event, context):
@@ -60,7 +59,7 @@ def lambda_handler(event, context):
         print ("Create a vault password")
         create_vault_password(eventBody['application_name'], eventBody['vault_password_env'], eventBody['vault_password'])
     elif event['httpMethod']== "DELETE" :
-        print ("delete a vault password")
+        delete_vault_password(eventBody['application_name'], eventBody['vault_password_env'])
     # TODO: Actually don't make this crappy
     outcome = {
         "isBase64Encoded": 'false',
