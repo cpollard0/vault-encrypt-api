@@ -133,3 +133,34 @@ Resources:
             RestApiId: !Ref ansibleVaultAPI
             Path: /encrypt_secret
             Method: POST
+
+  parameterStoreKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: !Sub inf-ansiblevault-kms-${AWS::Region}-secretencryptionkey
+      Enabled: true
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: root can administer the key
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: "*"
+          - Sid: Allow use of the key
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:aws:iam::${AWS::AccountId}:root
+                - !GetAtt encryptLambdaRole.Arn
+                - !Sub arn:aws:iam::${AWS::AccountId}:role/access_aws_*_admin
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: "*"
