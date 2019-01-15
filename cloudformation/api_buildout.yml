@@ -156,7 +156,7 @@ Resources:
               AWS:
                 - !Sub arn:aws:iam::${AWS::AccountId}:root
                 - !GetAtt encryptLambdaRole.Arn
-                - !Sub arn:aws:iam::${AWS::AccountId}:role/access_aws_*_admin
+                - !Sub arn:aws:iam::${AWS::AccountId}:role/access_aws_sandbox_admin
             Action:
               - kms:Encrypt
               - kms:Decrypt
@@ -164,3 +164,9 @@ Resources:
               - kms:GenerateDataKey*
               - kms:DescribeKey
             Resource: "*"
+
+  parameterStoreKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub alias/inf-ansiblevault-kms-${AWS::Region}-secretencryptionkey
+      TargetKeyId: !Ref parameterStoreKmsKey
