@@ -23,28 +23,33 @@ ansible.constants.DEFAULT_REMOTE_TMP = '/tmp/ansible'
 ansible.local_tmp = '/tmp/ansible'
 
 SSM_CLIENT = boto3.client('ssm')
+SECRETS_MANAGER_CLIENT = boto3.client('secretsmanager')
 
 def make_secret(secret):
-    """ Makes an ansible vault secret; aka the vault password """
+    """ Makes an ansible vault secret"""
     from ansible.constants import DEFAULT_VAULT_ID_MATCH
     from ansible.parsing.vault import VaultSecret
     return [( DEFAULT_VAULT_ID_MATCH, VaultSecret(secret))]
 
-def get_vault_password(key_name):
+def get_vault_password(application_name, env):
     """ gets vault password file and returns it cleaned"""
     # TODO: Add returns if the vault password doesn't exist
-    response = SSM_CLIENT.get_parameter(
-        Name=key_name,
-        WithDecryption=True
+    current_secret_value = SECRETS_MANAGER_CLIENT.get_secret_value(
+        SecretId=application_name
     )
-    return response['Parameter']['Value']
+    json_current_secret = json.loads(current_secret_value['SecretString'])
+    return json_current_secret[env]
 
 def lambda_handler(event, context):
     """Main Lambda function."""
     # Get the vault password from SSM
     # TODO: Add validate input function
     eventBody = json.loads(event['body'])
-    vault_pass = get_vault_password(eventBody['key_name'])
+    application = eventBody['application']
+    env = eventBody['env']
+    vault_pass = get_vault_password(application, env).encode('utf-8')
+    print(vault_pass)
+    # vault_pass="abcdfefgha"
     # Instantiate the vault with the vault password
     vault = VaultLib(make_secret(vault_pass))
     # Encrypt the secret
@@ -59,6 +64,13 @@ def lambda_handler(event, context):
 
 def main():
     print("Main")
+    print(get_vault_password("chris_new_app4","preprd"))
+    event = {
+        'body': json.dumps({"application":"chris_new_app4", "env":"preprd", "secret":"isaac and jake are my joys!"})
+    }
+    print(event['body'])
+    print()
+    print(lambda_handler(event, ""))
 
 if __name__== "__main__":
-    main()
+  main()

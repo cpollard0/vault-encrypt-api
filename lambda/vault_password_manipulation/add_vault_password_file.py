@@ -17,7 +17,7 @@ DEBUG_MODE = True
 if DEBUG_MODE:
     LOGGER.setLevel(logging.DEBUG)
 
-SSM_CLIENT = boto3.client('ssm')
+SECRETS_MANAGER_CLIENT = boto3.client('secretsmanager')
 SSM_BASE_PATH = "/ansible/vault_passwords/"
 """ limitations on parameter names
 A parameter name must be unique within an AWS Region
@@ -30,25 +30,64 @@ def create_vault_password(application_name, vault_password_env, vault_password):
     """ creates or updates an ansible vault password """
     # TODO: Add logic to see if new/old differ; saving on unnecessary versions
     LOGGER.debug(SSM_BASE_PATH + application_name + "/" + vault_password_env )
-    response = SSM_CLIENT.put_parameter(
-        Name=SSM_BASE_PATH + application_name + "/" + vault_password_env,
-        Description='Vault password for ' + application_name + ' for env ' + vault_password_env,
-        Value=vault_password,
-        Type='SecureString',
-        Overwrite=True
-        # TODO: Add in KMS CMK; can specify CMK based on access; i.e. read only vs power?
-        #KeyId='string',
-    )
-    LOGGER.debug(response)
+    create_new = False
+    try:
+        current_secret_value = SECRETS_MANAGER_CLIENT.get_secret_value(
+            SecretId=application_name
+        )
+        json_current_secret = json.loads(current_secret_value['SecretString'])
+        json_current_secret[vault_password_env] = vault_password
+        response = SECRETS_MANAGER_CLIENT.update_secret(
+            SecretId=application_name,
+            SecretString=json.dumps(json_current_secret),
+        )
+        LOGGER.info("Secret updated")
+    # if ResourceNotFoundException we're fine; we need to create the secret
+    except ClientError as err:
+        if err.response['Error']['Code'] == 'ResourceNotFoundException':
+            create_new = True
+            pass
+        else:
+            LOGGER.error(err)
+    if create_new:
+        response = SECRETS_MANAGER_CLIENT.create_secret(
+            Name=application_name,
+            Description= application_name + " vault password files",
+            #ClientRequestToken='string',
+            # SecretBinary=b'bytes',
+            SecretString='{"' +  vault_password_env + '":"' + vault_password + '"}',
+            # VersionStages=[
+            #     'string',
+            # ]
+        )
+        LOGGER.info("Secret added")
+        LOGGER.debug(response)
     return
 
-def delete_vault_password(application_name, vault_password_env):
-    """ deletes an ansible vault password as stored in SSM"""
-    response = SSM_CLIENT.delete_parameter(
-        Name=SSM_BASE_PATH + application_name + "/" + vault_password_env
+def delete_secret(application_name, vault_password_env):
+    """ deletes ansible vault passwords stored in secret manager"""
+    LOGGER.debug("Begin delete secret")
+    response = SECRETS_MANAGER_CLIENT.delete_secret(
+        SecretId=application
     )
-    LOGGER.debug(response)
+    LOGGER.debug("End delete secret")
     return
+
+def generate_secret():
+    """ generates a random string """
+    LOGGER.debug("Begin generate random string")
+    response = SECRETS_MANAGER_CLIENT.get_random_password(
+        PasswordLength=32,
+        # ExcludeCharacters='string',
+        # ExcludeNumbers=True|False,
+        ExcludePunctuation=True,
+        # ExcludeUppercase=True|False,
+        # ExcludeLowercase=True|False,
+        IncludeSpace=False,
+        # RequireEachIncludedType=True|False
+    )
+    LOGGER.debug("End generate random string")
+    return response['RandomPassword']
 
 def lambda_handler(event, context):
     """Main Lambda function."""
@@ -57,8 +96,12 @@ def lambda_handler(event, context):
     eventBody = json.loads(event['body'])
     # TODO: Add validate input function
     if event['httpMethod']== "POST" or event['httpMethod']== "PUT" :
-        print ("Create a vault password")
-        create_vault_password(eventBody['application_name'], eventBody['vault_password_env'], eventBody['vault_password'])
+        LOGGER.debug("Create a vault password")
+        if 'vault_password' not in eventBody:
+            vault_password = generate_secret()
+        else:
+            vault_password = eventBody['vault_password']
+        create_vault_password(eventBody['application_name'], eventBody['vault_password_env'], vault_password)
     elif event['httpMethod']== "DELETE" :
         delete_vault_password(eventBody['application_name'], eventBody['vault_password_env'])
     # TODO: Actually don't make this crappy
@@ -73,8 +116,8 @@ def lambda_handler(event, context):
 def main():
   print("Main")
   # create_vault_password("chris_test_app", "nonprd", "blahbalalkdsajfals;jf")
-  create_vault_password("chris_test_app", "preprd", "asdfteaeawt")
-  create_vault_password("chris_test_app", "prd", "blarghahsdf")
+  create_vault_password("chris_new_app4", "preprd", generate_secret())
+  create_vault_password("chris_new_app4", "prd", "blarghahsdf")
 
 if __name__== "__main__":
   main()
