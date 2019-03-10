@@ -9,35 +9,39 @@
     lambda_function_name: inf-vault-lam-encrypt
     lambda_filename: "{{ lambda_function_name }}_test.zip"
     lambda_path: "{{ playbook_dir }}/lambda/vault_encrypt_lambda"
-
+    label: cmp
+    aws_region: "us-east-1"
+    aws_access_key: "ASIA4J5BAWLCGHBZEQWX"
+    aws_secret_key: "L4brNeQU5IqV95qX4V9HQIVoTG0zg1k1MTSKFQvH"
+    security_token: "FQoGZXIvYXdzEMv//////////wEaDDVD7clNbdR9iQbBmiLdAkPD8CUSpaJ6U/ewGTM0ITlIgIQ13VrzCMztqSCkgSmgiNxsDBcSXxvQ21aurtnGYDEf3Ok0gJesxwRprRLl0snrraFPBKvMXrLWgmBupmPcfwTgfXd5bKpS8eaWHwypQBegD4BYsyTknH9vbmk6xabvsu6hd5G1Jldw5iMMyuzW67h30R3u8aoB7qOf3qX/BcPlrguTpohP/QL3Xz6TRSYoM9FkLOg0ky66RJCnsf+e37oxlN3buIZNUMshg1iVnuYjel6OAL2iJJ5MxfqQxBp7qn5iovIkvbPcsyLXqPZeALmiudc2gobImqLZXw24FMW7i+CHDtMbBWgtRKMYezEYkKPKgps4zDSlRSID8lyR7bfvC8VcppDDQABChF8DbyvKiWmsw6gwVuOsPqVkiqDJdftlYzWiECQ/11u++WWUzRLXyW+5BDBUMm9Shdc5z+L+KQrKKwMEZJnvPSUor9mR5AU="
   tasks:
-    - name: create build directory
-      file:
-        path: "{{ lambda_path }}/build"
-        state: directory
+    # - name: create build directory
+    #   file:
+    #     path: "{{ lambda_path }}/build"
+    #     state: directory
 
-    - name: cpy lambda function to build directory
-      copy:
-        src: "{{ lambda_path }}/vault_encrypt_lambda.py"
-        dest: "{{ lambda_path }}/build/vault_encrypt_lambda.py"
+    # - name: cpy lambda function to build directory
+    #   copy:
+    #     src: "{{ lambda_path }}/vault_encrypt_lambda.py"
+    #     dest: "{{ lambda_path }}/build/vault_encrypt_lambda.py"
 
     # - name: pip install reqs
     #   command: pip install -r {{ lambda_path }}/lambda_requirements.txt -t {{ lambda_path }}/build
     #   args:
     #     chdir: "{{ lambda_path }}"
 
-    # TODO: Get pycrypto from here: https://github.com/Miserlou/lambda-packages
+    # # TODO: Get pycrypto from here: https://github.com/Miserlou/lambda-packages
 
-    # This is needed to configure temp directory from ~/tmp to /tmp (can't write to ~/tmp in lambda)
-    - name: copy ansible.cfg to build dir
-      copy:
-        src: "{{ playbook_dir }}/ansible.cfg"
-        dest: "{{ lambda_path }}/build/ansible.cfg"
+    # # This is needed to configure temp directory from ~/tmp to /tmp (can't write to ~/tmp in lambda)
+    # - name: copy ansible.cfg to build dir
+    #   copy:
+    #     src: "{{ playbook_dir }}/ansible.cfg"
+    #     dest: "{{ lambda_path }}/build/ansible.cfg"
 
-    - name: create build for lambda
-      command: zip -r {{ lambda_path }}/build/{{ lambda_filename }} .
-      args:
-        chdir: "{{ lambda_path }}/build"
+    # - name: create build for lambda
+    #   command: zip -r {{ lambda_path }}/build/{{ lambda_filename }} .
+    #   args:
+    #     chdir: "{{ lambda_path }}/build"
 
     # - name: create lambda role
     #   cloudformation:
@@ -45,33 +49,77 @@
     #     aws_secret_key: "{{ aws_secret_key }}"
     #     security_token: "{{ security_token }}"
     #     region: "{{ aws_region }}"
-    #     stack_name: "pin-mysql-cf-setup{{ label }}"
+    #     stack_name: "inf-vaultencrypt-cf-{{ aws_region }}-{{ label }}"
     #     state: present
     #     disable_rollback: true
-    #     template: cloudformation/mysql_user_lambda_role.yml
+    #     template: cloudformation/vault_encrypt_role.yml
     #     template_parameters:
     #       environment: "{{ label }}"
-    #       ssmMysqlHost: "{{ ssm_mysql_host }}"
-    #       ssmProftpdPass: "{{ ssm_proftpd_pass }}"
-    #       pStoreKMSPolicyArn: "{{ kms_managed_policy_arn }}"
-    #     tags:
-    #       project: "aws-cfm"
     #   register: lambda_role
     #   delegate_to: localhost
 
-    # - name: create lambda function
-    #   lambda:
-    #     aws_access_key: "{{ aws_access_key }}"
-    #     aws_secret_key: "{{ aws_secret_key }}"
-    #     security_token: "{{ security_token }}"
-    #     region: "{{ aws_region }}"
-    #     name: inf-vaultencrypt-lam-cmp
-    #     state: present
-    #     zip_file: '{{ lambda_path }}/{{ lambda_filename }}'
-    #     runtime: 'python2.7'
-    #     role: "{{ lambda_role['stack_outputs']['vault_encrypt_role'] }}"
-    #     handler: lambda_function.lambda_handler
-    #     timeout: 120
-    #     memory_size: 1280 # This is based on testing; 600 MS execution time; seems to be as low as we can get it
-    #   register: lambda_function
-    #   delegate_to: localhost
+    - name: vault_encrypt lambda function
+      lambda:
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        security_token: "{{ security_token }}"
+        region: "{{ aws_region }}"
+        name: inf-vaultencrypt-lam-cmp
+        state: present
+        zip_file: '{{ lambda_path }}/build/{{ lambda_filename }}'
+        runtime: 'python2.7'
+        role: arn:aws:iam::845909373636:role/cloud-custodian  #  "{{ lambda_role['stack_outputs']['vault_encrypt_role'] }}"
+        handler: lambda_function.lambda_handler
+        timeout: 120
+        memory_size: 1280 # This is based on testing; 600 MS execution time; seems to be as low as we can get it
+      register: lambda_function
+      delegate_to: localhost
+
+    - name: set lambda path
+      set_fact:
+        lambda_path: "{{ playbook_dir }}/lambda/vault_password_manipulation"
+
+    - name: create build directory
+      file:
+        path: "{{ lambda_path }}/build"
+        state: directory
+
+    - name: cpy lambda function to build directory
+      copy:
+        src: "{{ lambda_path }}/vault_password_manipulation.py"
+        dest: "{{ lambda_path }}/build/vault_password_manipulation.py"
+
+    # - name: pip install reqs
+    #   command: pip install -r {{ lambda_path }}/lambda_requirements.txt -t {{ lambda_path }}/build
+    #   args:
+    #     chdir: "{{ lambda_path }}"
+
+    # # TODO: Get pycrypto from here: https://github.com/Miserlou/lambda-packages
+
+    # # This is needed to configure temp directory from ~/tmp to /tmp (can't write to ~/tmp in lambda)
+    # - name: copy ansible.cfg to build dir
+    #   copy:
+    #     src: "{{ playbook_dir }}/ansible.cfg"
+    #     dest: "{{ lambda_path }}/build/ansible.cfg"
+
+    - name: create build for lambda
+      command: zip -r {{ lambda_path }}/build/vault_password_manipulation.zip .
+      args:
+        chdir: "{{ lambda_path }}/build"
+
+    - name: vault passwords lambda function
+      lambda:
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        security_token: "{{ security_token }}"
+        region: "{{ aws_region }}"
+        name: inf-vaultpwmanip-lam-cmp
+        state: present
+        zip_file: '{{ lambda_path }}/build/vault_password_manipulation.zip'
+        runtime: 'python2.7'
+        role: arn:aws:iam::845909373636:role/cloud-custodian  #  "{{ lambda_role['stack_outputs']['vault_encrypt_role'] }}"
+        handler: lambda_function.lambda_handler
+        timeout: 120
+        memory_size: 1280 # This is based on testing; 600 MS execution time; seems to be as low as we can get it
+      register: lambda_function
+      delegate_to: localhost
