@@ -6,120 +6,115 @@
   ignore_errors: true
 
   vars:
-    lambda_function_name: inf-vault-lam-encrypt
-    lambda_filename: "{{ lambda_function_name }}_test.zip"
-    lambda_path: "{{ playbook_dir }}/lambda/vault_encrypt_lambda"
+    build_number: "ba"
+    lambda_functions:
+      - lambda_path: "{{ playbook_dir }}/lambda/vault_encrypt_lambda"
+        lambda_function_name: inf-vault-lam-encrypt
+        python_name: vault_encrypt_lambda.py
+        lambda_filename: vault_encrypt_lambda_{{ build_number }}.zip
+        extra_config: true
+      - lambda_path: "{{ playbook_dir }}/lambda/vault_password_manipulation"
+        lambda_function_name: inf-vault-lam-encrypt
+        python_name: vault_password_manipulation.py
+        lambda_filename: vault_password_manipulation_{{ build_number }}.zip
+        extra_config: false
     label: cmp
     aws_region: "us-east-1"
-    aws_access_key: "ASIA4J5BAWLCGHBZEQWX"
-    aws_secret_key: "L4brNeQU5IqV95qX4V9HQIVoTG0zg1k1MTSKFQvH"
-    security_token: "FQoGZXIvYXdzEMv//////////wEaDDVD7clNbdR9iQbBmiLdAkPD8CUSpaJ6U/ewGTM0ITlIgIQ13VrzCMztqSCkgSmgiNxsDBcSXxvQ21aurtnGYDEf3Ok0gJesxwRprRLl0snrraFPBKvMXrLWgmBupmPcfwTgfXd5bKpS8eaWHwypQBegD4BYsyTknH9vbmk6xabvsu6hd5G1Jldw5iMMyuzW67h30R3u8aoB7qOf3qX/BcPlrguTpohP/QL3Xz6TRSYoM9FkLOg0ky66RJCnsf+e37oxlN3buIZNUMshg1iVnuYjel6OAL2iJJ5MxfqQxBp7qn5iovIkvbPcsyLXqPZeALmiudc2gobImqLZXw24FMW7i+CHDtMbBWgtRKMYezEYkKPKgps4zDSlRSID8lyR7bfvC8VcppDDQABChF8DbyvKiWmsw6gwVuOsPqVkiqDJdftlYzWiECQ/11u++WWUzRLXyW+5BDBUMm9Shdc5z+L+KQrKKwMEZJnvPSUor9mR5AU="
+    #  Extreme laziness; this is the credentials file format; i trnaslate it to our format
+    #  they're also temp so no leaking
+    aws_access_key_id: ASIA4J5BAWLCDG7ZLCP5
+    aws_secret_access_key: Cz8YbL0yduxDib/CrdO0lEePJ2ifiZr1xUGqex3u
+    aws_session_token: FQoGZXIvYXdzEPD//////////wEaDEmPhlSHNWb24J8DciLdAlbxPUYibD2uJGWHXHafiUCaWyMGp71hHRb0UEc6jsphbebx5yWWQtBvjyjK+NwptIfAQhVOk5Kqc0MNKUbhl/TZfSBZ5TMORSbvALtZMwoi5unictqZggZb1vIN3LEQ+EVywKThfF+nWXtZng9LWpuiHd4t+JNaE91dWn4nKOhjmlOBHRv3C4T9+rexHxjedotrCH31isuGoykGe4ASpQ0x8hF1UOU8F/xgZD1Z86c0c7uyaU4A8RAJDW/dhZ3wpRO1l6XpLyskd+3dFR+ak7gTAlaNdvVVhnIYOCgObW113ketorTiBb4ia0Nmvfi3mOj3Mc0wnp1vV89O7h++GuRvA8buepHibeeg+ahftW7YdfSsJH/Qz1/wCzyPXrdJXfhoHE4pZEUaphVMptKqav8QM+b0NCqddV8nQ8vle+Ymydc+PcHA6tERWB8sg3nFvP5fMDZG50b8Cu7pkmAok+mZ5AU=
+    aws_access_key: "{{ aws_access_key_id }}"
+    aws_secret_key: "{{ aws_secret_access_key }}"
+    security_token: "{{ aws_session_token }}"
   tasks:
     # - name: create build directory
     #   file:
-    #     path: "{{ lambda_path }}/build"
+    #     path: "{{ item.lambda_path }}/build"
     #     state: directory
-
-    # - name: cpy lambda function to build directory
-    #   copy:
-    #     src: "{{ lambda_path }}/vault_encrypt_lambda.py"
-    #     dest: "{{ lambda_path }}/build/vault_encrypt_lambda.py"
-
-    # - name: pip install reqs
-    #   command: pip install -r {{ lambda_path }}/lambda_requirements.txt -t {{ lambda_path }}/build
-    #   args:
-    #     chdir: "{{ lambda_path }}"
-
-    # # TODO: Get pycrypto from here: https://github.com/Miserlou/lambda-packages
-
-    # # This is needed to configure temp directory from ~/tmp to /tmp (can't write to ~/tmp in lambda)
-    # - name: copy ansible.cfg to build dir
-    #   copy:
-    #     src: "{{ playbook_dir }}/ansible.cfg"
-    #     dest: "{{ lambda_path }}/build/ansible.cfg"
-
-    # - name: create build for lambda
-    #   command: zip -r {{ lambda_path }}/build/{{ lambda_filename }} .
-    #   args:
-    #     chdir: "{{ lambda_path }}/build"
-
-    # - name: create lambda role
-    #   cloudformation:
-    #     aws_access_key: "{{ aws_access_key }}"
-    #     aws_secret_key: "{{ aws_secret_key }}"
-    #     security_token: "{{ security_token }}"
-    #     region: "{{ aws_region }}"
-    #     stack_name: "inf-vaultencrypt-cf-{{ aws_region }}-{{ label }}"
-    #     state: present
-    #     disable_rollback: true
-    #     template: cloudformation/vault_encrypt_role.yml
-    #     template_parameters:
-    #       environment: "{{ label }}"
-    #   register: lambda_role
-    #   delegate_to: localhost
-
-    - name: vault_encrypt lambda function
-      lambda:
-        aws_access_key: "{{ aws_access_key }}"
-        aws_secret_key: "{{ aws_secret_key }}"
-        security_token: "{{ security_token }}"
-        region: "{{ aws_region }}"
-        name: inf-vaultencrypt-lam-cmp
-        state: present
-        zip_file: '{{ lambda_path }}/build/{{ lambda_filename }}'
-        runtime: 'python2.7'
-        role: arn:aws:iam::845909373636:role/cloud-custodian  #  "{{ lambda_role['stack_outputs']['vault_encrypt_role'] }}"
-        handler: lambda_function.lambda_handler
-        timeout: 120
-        memory_size: 1280 # This is based on testing; 600 MS execution time; seems to be as low as we can get it
-      register: lambda_function
-      delegate_to: localhost
-
-    - name: set lambda path
-      set_fact:
-        lambda_path: "{{ playbook_dir }}/lambda/vault_password_manipulation"
-
-    - name: create build directory
-      file:
-        path: "{{ lambda_path }}/build"
-        state: directory
+    #   with_items: "{{ lambda_functions }}"
 
     - name: cpy lambda function to build directory
       copy:
-        src: "{{ lambda_path }}/vault_password_manipulation.py"
-        dest: "{{ lambda_path }}/build/vault_password_manipulation.py"
+        src: "{{ item.lambda_path }}/{{ item.python_name }}"
+        dest: "{{ item.lambda_path }}/build/{{ item.python_name }}"
+      with_items: "{{ lambda_functions }}"
 
-    # - name: pip install reqs
-    #   command: pip install -r {{ lambda_path }}/lambda_requirements.txt -t {{ lambda_path }}/build
-    #   args:
-    #     chdir: "{{ lambda_path }}"
 
-    # # TODO: Get pycrypto from here: https://github.com/Miserlou/lambda-packages
+    # # - name: pip install reqs
+    # #   command: pip install -r {{ lambda_path }}/lambda_requirements.txt -t {{ lambda_path }}/build
+    # #   args:
+    # #     chdir: "{{ lambda_path }}"
 
-    # # This is needed to configure temp directory from ~/tmp to /tmp (can't write to ~/tmp in lambda)
-    # - name: copy ansible.cfg to build dir
-    #   copy:
-    #     src: "{{ playbook_dir }}/ansible.cfg"
-    #     dest: "{{ lambda_path }}/build/ansible.cfg"
+    # # # TODO: Get crypto from here: https://github.com/Miserlou/lambda-packages
+    # # # TODO: Then, copy crypto, cryptograhpy- dist-info and pycrypto dist info into build directory
+    # # # This is needed to configure temp directory from ~/tmp to /tmp (can't write to ~/tmp in lambda)
+    # # - name: copy ansible.cfg to build dir
+    # #   copy:
+    # #     src: "{{ playbook_dir }}/ansible.cfg"
+    # #     dest: "{{ lambda_path }}/build/ansible.cfg"
 
     - name: create build for lambda
-      command: zip -r {{ lambda_path }}/build/vault_password_manipulation.zip .
+      command: zip -r {{ item.lambda_path }}/build/{{ item.lambda_filename }} .
       args:
-        chdir: "{{ lambda_path }}/build"
+        chdir: "{{ item.lambda_path }}/build"
+      with_items: "{{ lambda_functions }}"
 
-    - name: vault passwords lambda function
-      lambda:
+    - name: upload lambds to s3
+      aws_s3:
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
         security_token: "{{ security_token }}"
-        region: "{{ aws_region }}"
-        name: inf-vaultpwmanip-lam-cmp
-        state: present
-        zip_file: '{{ lambda_path }}/build/vault_password_manipulation.zip'
-        runtime: 'python2.7'
-        role: arn:aws:iam::845909373636:role/cloud-custodian  #  "{{ lambda_role['stack_outputs']['vault_encrypt_role'] }}"
-        handler: lambda_function.lambda_handler
-        timeout: 120
-        memory_size: 1280 # This is based on testing; 600 MS execution time; seems to be as low as we can get it
-      register: lambda_function
+        bucket: pin-christest-s3-sbucket
+        object: "{{ item.lambda_filename }}"
+        src: "{{ item.lambda_path }}/build/{{ item.lambda_filename }}"
+        mode: put
+      with_items: "{{ lambda_functions }}"
       delegate_to: localhost
+
+    - name: upload swagger
+      aws_s3:
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        security_token: "{{ security_token }}"
+        bucket: pin-christest-s3-sbucket
+        object: ansible-api-swagger.yml
+        src: "{{ playbook_dir }}/swagger/ansible-api-swagger.yml"
+        mode: put
+      delegate_to: localhost
+
+    - name: package user api stack
+      # TODO: Ansible does not currently support transforms in cloudformation
+      command: >
+        aws cloudformation package
+        --template cloudformation/api_buildout.yml
+        --s3-bucket pin-christest-s3-sbucket
+        --output-template cloudformation/api_buildout_packaged.yml
+      environment:
+        AWS_DEFAULT_REGION: "us-east-1"
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
+        AWS_SECURITY_TOKEN: "{{ security_token }}"
+      delegate_to: localhost
+
+    - name: deploy stack
+      # TODO: Ansible does not currently support transforms in cloudformation
+      command: >
+        aws cloudformation deploy
+        --stack-name inf-cmp-cf-us-east-1-ansibleapi
+        --template-file cloudformation/api_buildout_packaged.yml
+        --capabilities CAPABILITY_NAMED_IAM
+        --parameter-overrides
+          "vaultEncryptLambdaFileName=vault_encrypt_lambda_{{ build_number }}.zip"
+          "vaultCreateLambdaFileName=vault_password_manipulation_{{ build_number }}.zip"
+      environment:
+        AWS_DEFAULT_REGION: "us-east-1"
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
+        AWS_SECURITY_TOKEN: "{{ security_token }}"
+      register: deploy_api_results
+      failed_when:
+        - deploy_api_results.rc != 0
+        - "'Successfully created/updated stack' not in deploy_api_results.stdout"
+        - "'No changes to deploy' not in deploy_api_results.stderr"

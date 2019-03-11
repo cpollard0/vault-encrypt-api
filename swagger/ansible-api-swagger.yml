@@ -1,5 +1,17 @@
 ---
 swagger: "2.0"
+x-amazon-apigateway-policy:
+  Version: "2012-10-17"
+  Statement:
+    - Effect: "Deny"
+      Principal: "*"
+      Action:
+        - "execute-api:Invoke"
+      Resource: "execute-api:/*"
+      Condition:
+        NotIpAddress:
+          aws:SourceIp:
+            - 208.184.9.4/32
 info:
   version: "1.0"
   title: "ansible vault API"
@@ -19,14 +31,40 @@ paths:
           description: "error vault encrypting a secret"
           schema:
             $ref: "#/definitions/Empty"
-      security:
-        - api_key: []
       x-amazon-apigateway-integration:
         responses:
           default:
             statusCode: "200"
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${encryptVaultSecretLambda.Arn}/invocations
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+  /vault_password/{applicationId}:
+    get:
+      produces:
+        - "application/json"
+      parameters:
+        - name: "application"
+          in: "path"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "succesfully gets a vault password"
+          schema:
+            $ref: "#/definitions/Empty"
+        404:
+          description: "error"
+          schema:
+            $ref: "#/definitions/Empty"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${vaultSecretLambda.Arn}/invocations
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
@@ -44,8 +82,6 @@ paths:
           description: "error creating a vault secret"
           schema:
             $ref: "#/definitions/Empty"
-      security:
-        - api_key: []
       x-amazon-apigateway-integration:
         responses:
           default:
@@ -77,8 +113,6 @@ paths:
           description: "error"
           schema:
             $ref: "#/definitions/Empty"
-      security:
-        - api_key: []
       x-amazon-apigateway-integration:
         responses:
           default:
@@ -101,8 +135,6 @@ paths:
           description: ""
           schema:
             $ref: "#/definitions/Empty"
-      security:
-        - api_key: []
       x-amazon-apigateway-integration:
         responses:
           default:
@@ -125,8 +157,6 @@ paths:
           description: ""
           schema:
             $ref: "#/definitions/Empty"
-      security:
-        - api_key: []
       x-amazon-apigateway-integration:
         responses:
           default:

@@ -1,0 +1,16 @@
+    <!-- <mat-form-field appearance="standard">
+      <mat-label>Standard form field</mat-label> -->
+      <!-- <input matInput placeholder="Placeholder"> -->
+      <br><label>
+        Name:
+        <input type="text" [formControl]="encryptSecretControl">
+      </label>
+      <button (click)="vaultEncryptSecret()">Encrypt Secret</button>
+      <app-get-application-list></app-get-application-list>
+      <!-- <mat-hint>Hint</mat-hint>
+    </mat-form-field> -->
+
+  <br>
+  vault encrypted secret <br>
+
+  <div class="multi_lines_text">{{ vault_secret }}</div>

@@ -7,6 +7,10 @@ Parameters:
     Description: s3 location of swagger file
     Type: String
     Default: pin-christest-s3-sbucket/ansible-api-swagger.yml
+  vaultEncryptLambdaFileName:
+    Type: String
+  vaultCreateLambdaFileName:
+    Type: String
 
 Resources:
   encryptLambdaRole:
@@ -30,9 +34,9 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - 'ssm:Get*'
+                  - 'secretsmanager:*'
                 Resource:
-                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/ansible/*'
+                  - "*" # !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/ansible/*'
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
@@ -57,9 +61,9 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - 'ssm:*'
+                  - 'secretsmanager:*'
                 Resource:
-                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/ansible/*'
+                  - "*" #  !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:secrets:*'
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
@@ -77,8 +81,8 @@ Resources:
   vaultSecretLambda:
     Type: AWS::Serverless::Function
     Properties:
-      Description: CRUD for vault secrets as stored in parameter store
-      Handler: add_vault_password_file.lambda_handler
+      Description: CRUD for vault secrets stored in secrets manager
+      Handler: vault_password_manipulation.lambda_handler
       Runtime: python2.7
       MemorySize: 128
       Timeout: 300
@@ -86,7 +90,7 @@ Resources:
       Role: !GetAtt passwordManipulationLambdaRole.Arn
       CodeUri:
         Bucket: pin-christest-s3-sbucket
-        Key: add_vault_password_file.zip
+        Key: !Ref vaultCreateLambdaFileName
       Events:
         ApiPost:
           Type: Api
@@ -125,7 +129,7 @@ Resources:
       Role: !GetAtt encryptLambdaRole.Arn
       CodeUri:
         Bucket: pin-christest-s3-sbucket
-        Key: inf-vault-lam-encrypt_test.zip
+        Key: !Ref vaultEncryptLambdaFileName
       Events:
         ApiPost:
           Type: Api
