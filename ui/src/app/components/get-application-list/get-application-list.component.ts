@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { APIService } from './../../services/api.service'
 
 @Component({
   selector: 'app-get-application-list',
@@ -7,9 +8,31 @@ import { Component, OnInit } from '@angular/core';
 })
 export class GetApplicationListComponent implements OnInit {
 
-  constructor() { }
+  application_list: any;
+  constructor(private apiService: APIService) { }
 
   ngOnInit() {
+    this.getApplicationList();
   }
 
+  async getApplicationList(){
+    const api_results = this.apiService.GetApplicationList().subscribe
+    (
+      data=> {
+        console.log(data);
+        this.application_list = data.body;
+      }
+    );
+  }
+
+ async GetEnvironmentsForApplication(application_name)
+ {
+    this.apiService.GetEnvironmentsForApplication("chris_new_app4").subscribe
+    (
+      data=> {
+        console.log(data);
+        this.application_list = data.body;
+      }
+  );
+  }
 }

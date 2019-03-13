@@ -104,6 +104,12 @@ Resources:
             RestApiId: !Ref ansibleVaultAPI
             Path: /vault_password
             Method: GET
+        ApiGetAppSecrets:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ansibleVaultAPI
+            Path: /vault_password/*
+            Method: GET
         ApiDelete:
           Type: Api
           Properties:

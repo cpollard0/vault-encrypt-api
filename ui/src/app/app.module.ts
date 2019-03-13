@@ -10,13 +10,15 @@ import { GetApplicationListComponent } from './components/get-application-list/g
 import { NavigationComponent } from './components/navigation/navigation.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SharedModule } from './shared.module';
+import { VaultPasswordManagementComponent } from './components/vault-password-management/vault-password-management.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     VaultEncryptComponent,
     GetApplicationListComponent,
-    NavigationComponent
+    NavigationComponent,
+    VaultPasswordManagementComponent
   ],
   imports: [
     BrowserModule,

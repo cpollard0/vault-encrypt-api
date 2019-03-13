@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 
 import {
   MatMenuModule,
+  MatSelectModule,
   MatTableModule,
   MatButtonModule,
   MatToolbarModule,
@@ -45,6 +46,7 @@ const ModuleImports: any = [
   MatPaginatorModule,
   MatExpansionModule,
   MatTooltipModule,
+  MatSelectModule
 ];
 
 @NgModule({

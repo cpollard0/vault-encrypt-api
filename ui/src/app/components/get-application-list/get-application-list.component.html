@@ -1,1 +1,7 @@
-Application: <select></select>
+<mat-form-field>
+    <mat-select placeholder="Application">
+        <mat-option *ngFor="let eachVal of application_list" [value]="eachVal">
+            {{ eachVal }}
+        </mat-option>
+    </mat-select>
+</mat-form-field>

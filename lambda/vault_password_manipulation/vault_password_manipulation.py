@@ -78,6 +78,31 @@ def delete_secret(application_name, vault_password_env):
     LOGGER.debug("End delete secret")
     return
 
+def get_all_applications():
+    # TODO: Paginate
+    LOGGER.debug("Begin get application list")
+    ansible_secrets=[]
+    response = SECRETS_MANAGER_CLIENT.list_secrets()
+    for secret in response['SecretList']:
+        if 'Tags' in secret:
+            for tag in secret['Tags']:
+                for key, value in tag.items():
+                    if value=="ansible-vault": # TODO: Need the combination of Key=app and Value=ansible-vault
+                        ansible_secrets.append(secret['Name'])
+    LOGGER.debug("End get application list")
+    return ansible_secrets
+
+def get_application_envs(application_name):
+    # TODO: Paginate
+    LOGGER.debug("Begin get application environments")
+    application_envs=[]
+    response = SECRETS_MANAGER_CLIENT.get_secret_value(SecretId=application_name)
+    secrets = json.loads(response['SecretString'])
+    for key, value in secrets.items():
+        application_envs.append(key)
+    LOGGER.debug("End get application environments")
+    return application_envs
+
 def generate_secret():
     """ generates a random string """
     LOGGER.debug("Begin generate random string")
@@ -99,9 +124,9 @@ def lambda_handler(event, context):
     """Main Lambda function."""
     LOGGER.debug(event)
     LOGGER.debug(context)
-    eventBody = json.loads(event['body'])
     # TODO: Add validate input function
     if event['httpMethod']== "POST" or event['httpMethod']== "PUT" :
+        eventBody = json.loads(event['body'])
         for env in eventBody['vault_password_env']:
             LOGGER.debug("Create a vault password")
             if 'vault_password' not in eventBody:
@@ -111,13 +136,20 @@ def lambda_handler(event, context):
             create_vault_password(eventBody['application_name'], env, vault_password)
     elif event['httpMethod'] == "GET":
         LOGGER.debug(event['pathParameters'])
+        if event['queryStringParameters'] is None and event['pathParameters'] is None:
+            body = get_all_applications()
     elif event['httpMethod']== "DELETE" :
         delete_vault_password(eventBody['application_name'], eventBody['vault_password_env'])
     # TODO: Actually don't make this crappy
+
     outcome = {
-        "isBase64Encoded": 'false',
+        "isBase64Encoded": 'true',
         "statusCode": 200,
-        "body": "done"
+        "body": json.dumps(body),
+        "headers": {
+            "Access-Control-Allow-Origin" : "*",
+            "Access-Control-Allow-Credentials": "true"
+        }
     }
     return outcome
 
@@ -126,11 +158,13 @@ def main():
     print("Main")
     # create_vault_password("chris_test_app", "nonprd", "blahbalalkdsajfals;jf")
 
-    event = {
-        'httpMethod': 'post',
-        'body': json.dumps({"application_name":"chris_new_app4", "vault_password_env":["sbx","foo", "bar"]})
-    }
-    lambda_handler(event, "")
+    # event = {
+    #     'httpMethod': 'post',
+    #     'body': json.dumps({"application_name":"chris_new_app4", "vault_password_env":["sbx","foo", "bar"]})
+    # }
+    # lambda_handler(event, "")
+    print(get_all_applications())
+    print(get_application_envs("chris_new_app4"))
 
 if __name__== "__main__":
     main()

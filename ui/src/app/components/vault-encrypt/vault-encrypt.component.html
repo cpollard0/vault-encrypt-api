@@ -1,16 +1,27 @@
     <!-- <mat-form-field appearance="standard">
       <mat-label>Standard form field</mat-label> -->
       <!-- <input matInput placeholder="Placeholder"> -->
-      <br><label>
+      <br>
+      <!-- <label>
         Name:
         <input type="text" [formControl]="encryptSecretControl">
       </label>
-      <button (click)="vaultEncryptSecret()">Encrypt Secret</button>
-      <app-get-application-list></app-get-application-list>
-      <!-- <mat-hint>Hint</mat-hint>
-    </mat-form-field> -->
-
+       -->
+<!-- <mat-grid-list cols="2" rowHeight="1:1">
+  <mat-grid-tile> -->
+  <app-get-application-list></app-get-application-list>
+  <br>
+  <mat-form-field>
+      <input matInput placeholder="Secret to Encrypt"  type="text" [formControl]="encryptSecretControl">
+  </mat-form-field>
+  <br>
+  <button (click)="vaultEncryptSecret()" mat-button>Encrypt Secret</button>
+        <!-- <mat-hint>Hint</mat-hint>
+      </mat-form-field> -->
+  <!-- </mat-grid-tile>
+  <mat-grid-tile> -->
   <br>
   vault encrypted secret <br>
-
   <div class="multi_lines_text">{{ vault_secret }}</div>
+  <!-- </mat-grid-tile>
+</mat-grid-list> -->
