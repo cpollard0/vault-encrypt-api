@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { APIService } from './../../services/api.service'
 import { FormControl } from '@angular/forms';
 import { GetApplicationListComponent } from '../get-application-list/get-application-list.component'
+import { GetApplicationEnvironmentsComponent } from '../get-application-environments/get-application-environments.component'
 
 @Component({
   selector: 'app-vault-encrypt',

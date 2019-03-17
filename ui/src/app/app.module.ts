@@ -6,11 +6,14 @@ import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { VaultEncryptComponent } from './components/vault-encrypt/vault-encrypt.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { GetApplicationListComponent } from './components/get-application-list/get-application-list.component';
 import { NavigationComponent } from './components/navigation/navigation.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SharedModule } from './shared.module';
 import { VaultPasswordManagementComponent } from './components/vault-password-management/vault-password-management.component';
+
+import { GetApplicationEnvironmentsComponent } from './components/get-application-environments/get-application-environments.component';
+import { GetApplicationListComponent } from './components/get-application-list/get-application-list.component';
+
 
 @NgModule({
   declarations: [
@@ -18,7 +21,8 @@ import { VaultPasswordManagementComponent } from './components/vault-password-ma
     VaultEncryptComponent,
     GetApplicationListComponent,
     NavigationComponent,
-    VaultPasswordManagementComponent
+    VaultPasswordManagementComponent,
+    GetApplicationEnvironmentsComponent
   ],
   imports: [
     BrowserModule,

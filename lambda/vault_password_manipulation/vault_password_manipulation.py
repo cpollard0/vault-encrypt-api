@@ -124,6 +124,7 @@ def lambda_handler(event, context):
     """Main Lambda function."""
     LOGGER.debug(event)
     LOGGER.debug(context)
+    response_body = ""
     # TODO: Add validate input function
     if event['httpMethod']== "POST" or event['httpMethod']== "PUT" :
         eventBody = json.loads(event['body'])
@@ -137,15 +138,17 @@ def lambda_handler(event, context):
     elif event['httpMethod'] == "GET":
         LOGGER.debug(event['pathParameters'])
         if event['queryStringParameters'] is None and event['pathParameters'] is None:
-            body = get_all_applications()
+            response_body = get_all_applications()
+        else:
+            application_id = event['pathParameters']['applicationId']
+            response_body = get_application_envs(application_id)
     elif event['httpMethod']== "DELETE" :
         delete_vault_password(eventBody['application_name'], eventBody['vault_password_env'])
     # TODO: Actually don't make this crappy
-
     outcome = {
         "isBase64Encoded": 'true',
         "statusCode": 200,
-        "body": json.dumps(body),
+        "body": json.dumps(response_body),
         "headers": {
             "Access-Control-Allow-Origin" : "*",
             "Access-Control-Allow-Credentials": "true"

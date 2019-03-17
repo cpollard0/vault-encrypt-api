@@ -1,0 +1,7 @@
+<mat-form-field>
+    <mat-select placeholder="Application">
+        <mat-option *ngFor="let eachVal of environment_list" [value]="eachVal">
+            {{ eachVal }}
+        </mat-option>
+    </mat-select>
+</mat-form-field>

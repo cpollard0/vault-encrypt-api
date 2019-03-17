@@ -6,7 +6,7 @@
   ignore_errors: true
 
   vars:
-    build_number: "ba"
+    build_number: "bb"
     lambda_functions:
       - lambda_path: "{{ playbook_dir }}/lambda/vault_encrypt_lambda"
         lambda_function_name: inf-vault-lam-encrypt
@@ -22,9 +22,9 @@
     aws_region: "us-east-1"
     #  Extreme laziness; this is the credentials file format; i trnaslate it to our format
     #  they're also temp so no leaking
-    aws_access_key_id: ASIA4J5BAWLCDG7ZLCP5
-    aws_secret_access_key: Cz8YbL0yduxDib/CrdO0lEePJ2ifiZr1xUGqex3u
-    aws_session_token: FQoGZXIvYXdzEPD//////////wEaDEmPhlSHNWb24J8DciLdAlbxPUYibD2uJGWHXHafiUCaWyMGp71hHRb0UEc6jsphbebx5yWWQtBvjyjK+NwptIfAQhVOk5Kqc0MNKUbhl/TZfSBZ5TMORSbvALtZMwoi5unictqZggZb1vIN3LEQ+EVywKThfF+nWXtZng9LWpuiHd4t+JNaE91dWn4nKOhjmlOBHRv3C4T9+rexHxjedotrCH31isuGoykGe4ASpQ0x8hF1UOU8F/xgZD1Z86c0c7uyaU4A8RAJDW/dhZ3wpRO1l6XpLyskd+3dFR+ak7gTAlaNdvVVhnIYOCgObW113ketorTiBb4ia0Nmvfi3mOj3Mc0wnp1vV89O7h++GuRvA8buepHibeeg+ahftW7YdfSsJH/Qz1/wCzyPXrdJXfhoHE4pZEUaphVMptKqav8QM+b0NCqddV8nQ8vle+Ymydc+PcHA6tERWB8sg3nFvP5fMDZG50b8Cu7pkmAok+mZ5AU=
+    aws_access_key_id: ASIA4J5BAWLCHQ7HCECV
+    aws_secret_access_key: 2ZwGbf5Alk0H0Nuy+lexv8qoexrMfkVgKigTxx22
+    aws_session_token: FQoGZXIvYXdzEIX//////////wEaDJR3qym4vUHridWQ2SLdAjQGhYvt8A87Z5AtEzJ6RIZItv8tC0S1YaFu7EPoeePELEkBaDEr9FbUJUNtZXzKkTVUqDAug45l4yEu6B8Ijix7rAaAyYN5xzMrsKljL+4R6fKblJWJc4bWJE816U0xnu38+D8tOVAEnodO0DGenaZMeWZI4m+A4I7b4dVuOQvN4norL3+fKqKBYgVudxWNBOHF8LBYucPuxGJgWNuc2JKZyZo66ynB420IkpBNoH8ig+ZgOffNX/drNhA7Kuk4jZiRxWXR3tRFy5Yus5+nOEfXFl5s1+302ooopXsD08CVQR7R+ShC5mQb51j/MDrY81q4eBTSWXatgUs6eR3+6flDh3Yx2pP5slmQyuTIckhtwjaibc/zvPoMBhAfaUD/66ijl8lzM3MS4a7xngNVze7scGhQk8vsQLsleKkHXqo1D039gRTH/CsFWHSHrHxJxzpATHNPjTDgR/X8biIoocm65AU=
     aws_access_key: "{{ aws_access_key_id }}"
     aws_secret_key: "{{ aws_secret_access_key }}"
     security_token: "{{ aws_session_token }}"
@@ -35,43 +35,43 @@
     #     state: directory
     #   with_items: "{{ lambda_functions }}"
 
-    - name: cpy lambda function to build directory
-      copy:
-        src: "{{ item.lambda_path }}/{{ item.python_name }}"
-        dest: "{{ item.lambda_path }}/build/{{ item.python_name }}"
-      with_items: "{{ lambda_functions }}"
+    # - name: cpy lambda function to build directory
+    #   copy:
+    #     src: "{{ item.lambda_path }}/{{ item.python_name }}"
+    #     dest: "{{ item.lambda_path }}/build/{{ item.python_name }}"
+    #   with_items: "{{ lambda_functions }}"
 
 
-    # # - name: pip install reqs
-    # #   command: pip install -r {{ lambda_path }}/lambda_requirements.txt -t {{ lambda_path }}/build
-    # #   args:
-    # #     chdir: "{{ lambda_path }}"
+    # # # - name: pip install reqs
+    # # #   command: pip install -r {{ lambda_path }}/lambda_requirements.txt -t {{ lambda_path }}/build
+    # # #   args:
+    # # #     chdir: "{{ lambda_path }}"
 
-    # # # TODO: Get crypto from here: https://github.com/Miserlou/lambda-packages
-    # # # TODO: Then, copy crypto, cryptograhpy- dist-info and pycrypto dist info into build directory
-    # # # This is needed to configure temp directory from ~/tmp to /tmp (can't write to ~/tmp in lambda)
-    # # - name: copy ansible.cfg to build dir
-    # #   copy:
-    # #     src: "{{ playbook_dir }}/ansible.cfg"
-    # #     dest: "{{ lambda_path }}/build/ansible.cfg"
+    # # # # TODO: Get crypto from here: https://github.com/Miserlou/lambda-packages
+    # # # # TODO: Then, copy crypto, cryptograhpy- dist-info and pycrypto dist info into build directory
+    # # # # This is needed to configure temp directory from ~/tmp to /tmp (can't write to ~/tmp in lambda)
+    # # # - name: copy ansible.cfg to build dir
+    # # #   copy:
+    # # #     src: "{{ playbook_dir }}/ansible.cfg"
+    # # #     dest: "{{ lambda_path }}/build/ansible.cfg"
 
-    - name: create build for lambda
-      command: zip -r {{ item.lambda_path }}/build/{{ item.lambda_filename }} .
-      args:
-        chdir: "{{ item.lambda_path }}/build"
-      with_items: "{{ lambda_functions }}"
+    # - name: create build for lambda
+    #   command: zip -r {{ item.lambda_path }}/build/{{ item.lambda_filename }} .
+    #   args:
+    #     chdir: "{{ item.lambda_path }}/build"
+    #   with_items: "{{ lambda_functions }}"
 
-    - name: upload lambds to s3
-      aws_s3:
-        aws_access_key: "{{ aws_access_key }}"
-        aws_secret_key: "{{ aws_secret_key }}"
-        security_token: "{{ security_token }}"
-        bucket: pin-christest-s3-sbucket
-        object: "{{ item.lambda_filename }}"
-        src: "{{ item.lambda_path }}/build/{{ item.lambda_filename }}"
-        mode: put
-      with_items: "{{ lambda_functions }}"
-      delegate_to: localhost
+    # - name: upload lambds to s3
+    #   aws_s3:
+    #     aws_access_key: "{{ aws_access_key }}"
+    #     aws_secret_key: "{{ aws_secret_key }}"
+    #     security_token: "{{ security_token }}"
+    #     bucket: pin-christest-s3-sbucket
+    #     object: "{{ item.lambda_filename }}"
+    #     src: "{{ item.lambda_path }}/build/{{ item.lambda_filename }}"
+    #     mode: put
+    #   with_items: "{{ lambda_functions }}"
+    #   delegate_to: localhost
 
     - name: upload swagger
       aws_s3:
