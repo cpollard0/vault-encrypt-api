@@ -9,7 +9,7 @@ export class APIService {
   api_base = "https://42zy2ihep5.execute-api.us-east-1.amazonaws.com/LATEST"
   constructor(private http: HttpClient) { }
 
-  VaultEncryptSecret(secret: String): Observable<any>
+  VaultEncryptSecret(secret: String, application: String, environment: String): Observable<any>
   {
     var event = {"application":"chris_new_app4", "env":"preprd", "secret": secret};
     const httpOptions: { headers; observe; } = {

@@ -22,9 +22,9 @@
     aws_region: "us-east-1"
     #  Extreme laziness; this is the credentials file format; i trnaslate it to our format
     #  they're also temp so no leaking
-    aws_access_key_id: ASIA4J5BAWLCHQ7HCECV
-    aws_secret_access_key: 2ZwGbf5Alk0H0Nuy+lexv8qoexrMfkVgKigTxx22
-    aws_session_token: FQoGZXIvYXdzEIX//////////wEaDJR3qym4vUHridWQ2SLdAjQGhYvt8A87Z5AtEzJ6RIZItv8tC0S1YaFu7EPoeePELEkBaDEr9FbUJUNtZXzKkTVUqDAug45l4yEu6B8Ijix7rAaAyYN5xzMrsKljL+4R6fKblJWJc4bWJE816U0xnu38+D8tOVAEnodO0DGenaZMeWZI4m+A4I7b4dVuOQvN4norL3+fKqKBYgVudxWNBOHF8LBYucPuxGJgWNuc2JKZyZo66ynB420IkpBNoH8ig+ZgOffNX/drNhA7Kuk4jZiRxWXR3tRFy5Yus5+nOEfXFl5s1+302ooopXsD08CVQR7R+ShC5mQb51j/MDrY81q4eBTSWXatgUs6eR3+6flDh3Yx2pP5slmQyuTIckhtwjaibc/zvPoMBhAfaUD/66ijl8lzM3MS4a7xngNVze7scGhQk8vsQLsleKkHXqo1D039gRTH/CsFWHSHrHxJxzpATHNPjTDgR/X8biIoocm65AU=
+    aws_access_key_id: ASIA4J5BAWLCF27U3PID
+    aws_secret_access_key: URu+/QUC/SvejJw3Ja7wbnfVOjgOR6sKXOIHSL9p
+    aws_session_token: FQoGZXIvYXdzEIb//////////wEaDPJEoeF5pSK6C7mTEiLdAk5RhEEYvXjB1fvTDAbjF8ZPw2b96Wv4dCgGehOobPyplIHrmhtVST1fwXQ+6ELRDOXZilH0xOrQhdNg0ixYgbFsrMJEszdPfyY+XRLjtxsx0llsZFgFGcdHp0PO3v2sfffIh3srQWcnQlUT7QTwzb1GJWf5AIT668MO1L8jv4T0hcK+vSCWdZ+J5lklatjdOyNExzQVjM9Y4pQwwPsXFGo6OZRXzdUY9oqw3DayJprvNGQ8Sin/URO5A+bDo/KVHllrR+QB/Rg+hlRV7VtfFG6wysVJCB3bAuqDPzpGAuN+0voenH/B8O3teP/D83sa4RUcFhVZXRpZAd1YbtxzT/oxI5SytvfvadXPHRMWq9WDoX0YQFmQ0K3IO1coTJOmJ7FfhPsIX7gAidYQCOq5fFD8w73nY3o5LMbAM0rarrFNOrW9sWt36cqbunjvNs4vR55tjslt9eyCumXGPscov+m65AU=
     aws_access_key: "{{ aws_access_key_id }}"
     aws_secret_key: "{{ aws_secret_access_key }}"
     security_token: "{{ aws_session_token }}"

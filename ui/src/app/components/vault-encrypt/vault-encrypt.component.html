@@ -1,28 +1,27 @@
-    <!-- <mat-form-field appearance="standard">
-      <mat-label>Standard form field</mat-label> -->
-      <!-- <input matInput placeholder="Placeholder"> -->
-      <br>
-      <!-- <label>
-        Name:
-        <input type="text" [formControl]="encryptSecretControl">
-      </label>
-       -->
-<!-- <mat-grid-list cols="2" rowHeight="1:1">
-  <mat-grid-tile> -->
-  <app-get-application-list></app-get-application-list>
-  <app-get-application-environments></app-get-application-environments>
-  <br>
-  <mat-form-field>
-      <input matInput placeholder="Secret to Encrypt"  type="text" [formControl]="encryptSecretControl">
-  </mat-form-field>
-  <br>
-  <button (click)="vaultEncryptSecret()" mat-button>Encrypt Secret</button>
-        <!-- <mat-hint>Hint</mat-hint>
-      </mat-form-field> -->
-  <!-- </mat-grid-tile>
-  <mat-grid-tile> -->
-  <br>
-  vault encrypted secret <br>
-  <div class="multi_lines_text">{{ vault_secret }}</div>
-  <!-- </mat-grid-tile>
-</mat-grid-list> -->
+<br>
+<!-- <app-get-application-list [parentForm]="parentForm"></app-get-application-list> <br> -->
+<!-- <app-get-application-environments></app-get-application-environments> -->
+<mat-form-field>
+    <mat-select (selectionChange)="applicationChanged();" placeholder="Application" [formControl]="applicationControl">
+        <mat-option *ngFor="let app of application_list" [value]="app">
+            {{ app }}
+        </mat-option>
+    </mat-select>
+</mat-form-field>
+<br>
+<mat-form-field>
+    <mat-select placeholder="Environment" [formControl]="environmentControl">
+        <mat-option *ngFor="let env of environment_list" [value]="env">
+            {{ env }}
+        </mat-option>
+    </mat-select>
+</mat-form-field>
+<br>
+<mat-form-field>
+    <input matInput placeholder="Secret to Encrypt"  type="text" [formControl]="encryptSecretControl">
+</mat-form-field>
+<br>
+<button (click)="vaultEncryptSecret()" mat-button>Encrypt Secret</button>
+<br>
+vault encrypted secret <br>
+<div class="multi_lines_text">{{ vault_secret }}</div>

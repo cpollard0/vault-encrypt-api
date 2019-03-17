@@ -1,7 +1,15 @@
 <mat-form-field>
-    <mat-select placeholder="Application">
-        <mat-option *ngFor="let eachVal of application_list" [value]="eachVal">
-            {{ eachVal }}
+    <mat-select (selectionChange)="applicationChanged();" placeholder="Application" [formControl]="applicationControl">
+        <mat-option *ngFor="let app of application_list" [value]="app">
+            {{ app }}
+        </mat-option>
+    </mat-select>
+</mat-form-field>
+<br>
+<mat-form-field>
+    <mat-select placeholder="Environment" [formControl]="environmentControl">
+        <mat-option *ngFor="let env of environment_list" [value]="env">
+            {{ env }}
         </mat-option>
     </mat-select>
 </mat-form-field>
