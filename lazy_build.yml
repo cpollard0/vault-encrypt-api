@@ -20,11 +20,6 @@
         extra_config: false
     label: cmp
     aws_region: "us-east-1"
-    #  Extreme laziness; this is the credentials file format; i trnaslate it to our format
-    #  they're also temp so no leaking
-    aws_access_key_id: ASIA4J5BAWLCF27U3PID
-    aws_secret_access_key: URu+/QUC/SvejJw3Ja7wbnfVOjgOR6sKXOIHSL9p
-    aws_session_token: FQoGZXIvYXdzEIb//////////wEaDPJEoeF5pSK6C7mTEiLdAk5RhEEYvXjB1fvTDAbjF8ZPw2b96Wv4dCgGehOobPyplIHrmhtVST1fwXQ+6ELRDOXZilH0xOrQhdNg0ixYgbFsrMJEszdPfyY+XRLjtxsx0llsZFgFGcdHp0PO3v2sfffIh3srQWcnQlUT7QTwzb1GJWf5AIT668MO1L8jv4T0hcK+vSCWdZ+J5lklatjdOyNExzQVjM9Y4pQwwPsXFGo6OZRXzdUY9oqw3DayJprvNGQ8Sin/URO5A+bDo/KVHllrR+QB/Rg+hlRV7VtfFG6wysVJCB3bAuqDPzpGAuN+0voenH/B8O3teP/D83sa4RUcFhVZXRpZAd1YbtxzT/oxI5SytvfvadXPHRMWq9WDoX0YQFmQ0K3IO1coTJOmJ7FfhPsIX7gAidYQCOq5fFD8w73nY3o5LMbAM0rarrFNOrW9sWt36cqbunjvNs4vR55tjslt9eyCumXGPscov+m65AU=
     aws_access_key: "{{ aws_access_key_id }}"
     aws_secret_key: "{{ aws_secret_access_key }}"
     security_token: "{{ aws_session_token }}"
@@ -78,7 +73,7 @@
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
         security_token: "{{ security_token }}"
-        bucket: pin-christest-s3-sbucket
+        bucket: christest-s3-sbucket
         object: ansible-api-swagger.yml
         src: "{{ playbook_dir }}/swagger/ansible-api-swagger.yml"
         mode: put
