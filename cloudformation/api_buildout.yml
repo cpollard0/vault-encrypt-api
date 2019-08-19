@@ -1,12 +1,11 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: CloudFTP User Management API
+Description: Vault encrypt API
 Parameters:
   swaggerS3Location:
     Description: s3 location of swagger file
     Type: String
-    Default: pin-christest-s3-sbucket/ansible-api-swagger.yml
   vaultEncryptLambdaFileName:
     Type: String
   vaultCreateLambdaFileName:
