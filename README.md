@@ -25,4 +25,4 @@ There are two lambdas -
 
 ## Future
 
-Build a serverless angular app that uses these APIs. Maybe integrate into ITMS?
+Build a serverless angular app that uses these APIs. 
