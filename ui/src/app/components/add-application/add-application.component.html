@@ -1,0 +1,24 @@
+<br>
+<!-- <app-get-application-list [parentForm]="parentForm"></app-get-application-list> <br> -->
+<!-- <app-get-application-environments></app-get-application-environments> -->
+<!-- <mat-form-field> -->
+<!-- <input matInput placeholder="Confirm Secret to Encrypt"  type="password" [formControl]="encryptSecretConfirmControl">
+</mat-form-field> -->
+<!-- <br> -->
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <mat-form-field>
+        <input matInput placeholder="Application Name" formControlName='applicationName'>
+    </mat-form-field>
+  <div formArrayName="items"
+    *ngFor="let item of form.controls['items'].controls; let i = index">
+    <div [formGroupName]="i">
+      <mat-form-field>
+        <input matInput placeholder="Environment" formControlName='environmentName'>
+      </mat-form-field>
+    </div>
+  </div>
+
+</form>
+<button (click)="addEnvironment()" mat-button>Add another environmnet</button>
+<button (click)="addApplication()" mat-button>Add Application</button>

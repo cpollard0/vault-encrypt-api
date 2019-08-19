@@ -134,7 +134,7 @@ def lambda_handler(event, context):
                 vault_password = generate_secret()
             else:
                 vault_password = eventBody['vault_password']
-            create_vault_password(eventBody['application_name'], env, vault_password)
+            create_vault_password(eventBody['application_name'], env, vault_password) # TODO: Validate input;
     elif event['httpMethod'] == "GET":
         LOGGER.debug(event['pathParameters'])
         if event['queryStringParameters'] is None and event['pathParameters'] is None:
@@ -148,7 +148,7 @@ def lambda_handler(event, context):
     outcome = {
         "isBase64Encoded": 'true',
         "statusCode": 200,
-        "body": json.dumps(response_body),
+        "body": json.dumps(response_body), # TODO: Make sure every method returns a body (add pytest or nose tests); no empty bodies!
         "headers": {
             "Access-Control-Allow-Origin" : "*",
             "Access-Control-Allow-Credentials": "true"

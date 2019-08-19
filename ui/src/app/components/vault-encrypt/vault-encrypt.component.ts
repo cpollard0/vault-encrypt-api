@@ -13,6 +13,7 @@ export class VaultEncryptComponent implements OnInit {
   applicationControl = new FormControl('');
   environmentControl = new FormControl('');
   encryptSecretControl = new FormControl('');
+  encryptSecretConfirmControl = new FormControl('');
   componentControl = new FormControl('');
 
   vault_secret: string;
@@ -50,12 +51,26 @@ export class VaultEncryptComponent implements OnInit {
    }
 
   async vaultEncryptSecret(){
-    const api_results = this.apiService.VaultEncryptSecret(this.encryptSecretControl.value, this.applicationControl.value, this.environmentControl.value).subscribe
-    (
-      data=> {
-        this.vault_secret = atob(data.body.secret);
-      }
-    );
+    if (this.validateSecretMatch())
+    {
+      this.apiService.VaultEncryptSecret(this.encryptSecretControl.value, this.applicationControl.value, this.environmentControl.value).subscribe
+      (
+        data=> {
+          this.vault_secret = atob(data.body.secret);
+        }
+      );
+    }
+  }
+
+  validateSecretMatch()
+  {
+    if (this.encryptSecretControl.value == this.encryptSecretConfirmControl.value){
+      return true;
+    }
+    else{
+      alert("Secrets don't match");
+      return false;
+    }
   }
 
 }

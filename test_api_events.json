@@ -1,0 +1,8 @@
+// encrypt a secret
+{"application":"chris_new_app4", "env":"preprd", "secret":"isaac and jake are my joys!"}
+
+// add a secret
+{"application_name":"chris_new_app4", "vault_password_env":["sbx","foo", "bar"]}
+
+
+application=cmp_new_1&vault_password_file_env=preprd

@@ -18,10 +18,19 @@
 </mat-form-field>
 <br>
 <mat-form-field>
-    <input matInput placeholder="Secret to Encrypt"  type="text" [formControl]="encryptSecretControl">
+    <input matInput placeholder="Secret to Encrypt"  type="password" [formControl]="encryptSecretControl">
+</mat-form-field>
+<br>
+<mat-form-field>
+    <input matInput placeholder="Confirm Secret to Encrypt"  type="password" [formControl]="encryptSecretConfirmControl">
 </mat-form-field>
 <br>
 <button (click)="vaultEncryptSecret()" mat-button>Encrypt Secret</button>
 <br>
+<!--
+    TODO: Make this prettier
+    TODO: Add easy copy functionallity
+    TODO: Make hidden all text until secret is there
+-->
 vault encrypted secret <br>
 <div class="multi_lines_text">{{ vault_secret }}</div>

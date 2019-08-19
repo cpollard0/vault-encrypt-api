@@ -11,7 +11,7 @@ export class APIService {
 
   VaultEncryptSecret(secret: String, application: String, environment: String): Observable<any>
   {
-    var event = {"application":"chris_new_app4", "env":"preprd", "secret": secret};
+    var event = {"application": application , "env": environment, "secret": secret};
     const httpOptions: { headers; observe; } = {
       headers: new HttpHeaders({
         'Content-Type':  'application/json',
@@ -42,5 +42,17 @@ export class APIService {
       observe: 'response'
     };
     return this.http.get(this.api_base + "/vault_password/" + application_name, httpOptions);
+  }
+  CreateSecretForApplication(application_name): Observable<any>
+  {
+    var event = {"application_name": "testapp1" , "vault_password_env": ["tst1", "tst2"] };
+    const httpOptions: { headers; observe; } = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }),
+      observe: 'response'
+    };
+    return this.http.post(this.api_base + "/vault_password", event, httpOptions);
   }
 }

@@ -13,6 +13,9 @@ import { VaultPasswordManagementComponent } from './components/vault-password-ma
 
 import { GetApplicationEnvironmentsComponent } from './components/get-application-environments/get-application-environments.component';
 import { GetApplicationListComponent } from './components/get-application-list/get-application-list.component';
+import { AddApplicationComponent } from './components/add-application/add-application.component';
+import { AlterApplicationComponent } from './components/alter-application/alter-application.component';
+import { GenerateVaultedIamKeysComponent } from './generate-vaulted-iam-keys/generate-vaulted-iam-keys.component';
 
 
 @NgModule({
@@ -22,7 +25,10 @@ import { GetApplicationListComponent } from './components/get-application-list/g
     GetApplicationListComponent,
     NavigationComponent,
     VaultPasswordManagementComponent,
-    GetApplicationEnvironmentsComponent
+    GetApplicationEnvironmentsComponent,
+    AddApplicationComponent,
+    AlterApplicationComponent,
+    GenerateVaultedIamKeysComponent
   ],
   imports: [
     BrowserModule,
